@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Sono em Dia</title>
+<meta name="description" content="Rastreador de sono focado em padrões, qualidade e consistência para longevidade." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #f9782a;
+    --lime: #b1d927;
+    --teal: #19bbb3;
+    --teal-dark: #138a85;
+    --teal-soft: #e8f7f6;
+    --gray: #4a4f54;
+    --gray-soft: #8a8f95;
+    --beige: #f3e8da;
+    --beige-soft: #faf3e8;
+    --white: #ffffff;
+    --border: #e8dfd0;
+    --shadow: 0 2px 12px rgba(74, 79, 84, 0.06);
+    --shadow-lg: 0 8px 28px rgba(74, 79, 84, 0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--beige);
+    color: var(--gray);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .app { max-width: 760px; margin: 0 auto; padding: 20px 16px 100px; }
+
+  header.brand {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 4px 20px;
+  }
+  .brand-logo {
+    width: 44px; height: 44px; border-radius: 14px;
+    background: var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    box-shadow: var(--shadow);
+  }
+  .brand-text h1 { font-size: 20px; font-weight: 700; color: var(--gray); }
+  .brand-text p { font-size: 13px; color: var(--gray-soft); }
+
+  /* Tabs */
+  .tabs {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    background: var(--white);
+    padding: 6px;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    position: sticky; top: 12px; z-index: 50;
+  }
+  .tab {
+    font: inherit; cursor: pointer;
+    border: none; background: transparent;
+    padding: 10px 8px;
+    border-radius: 10px;
+    color: var(--gray-soft);
+    font-weight: 600; font-size: 13px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    transition: all .15s ease;
+  }
+  .tab svg { width: 18px; height: 18px; }
+  .tab:hover { background: var(--beige-soft); color: var(--gray); }
+  .tab.active { background: var(--teal); color: white; }
+
+  /* Cards */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .card h2 {
+    font-size: 16px; font-weight: 700; color: var(--gray);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h2 svg { width: 18px; height: 18px; color: var(--teal); }
+
+  /* Form */
+  .form-row { margin-bottom: 14px; }
+  .form-row label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: var(--gray); margin-bottom: 6px;
+  }
+  .form-row input[type="time"],
+  .form-row input[type="date"],
+  .form-row input[type="number"],
+  .form-row input[type="text"],
+  .form-row textarea,
+  .form-row select {
+    width: 100%; padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font: inherit; color: var(--gray);
+    background: var(--beige-soft);
+    transition: all .15s ease;
+  }
+  .form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+    outline: none; border-color: var(--teal); background: white;
+    box-shadow: 0 0 0 3px rgba(25,187,179,.15);
+  }
+  .form-row textarea { resize: vertical; min-height: 70px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .duration-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: var(--teal-soft);
+    color: var(--teal-dark);
+    border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    margin-top: 8px;
+  }
+
+  /* Quality slider */
+  .slider-wrap { padding: 4px 2px; }
+  .slider-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .slider-row input[type="range"] {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 6px; background: var(--border); border-radius: 999px;
+    outline: none;
+  }
+  .slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--teal); cursor: pointer;
+    box-shadow: 0 2px 6px rgba(25,187,179,.4);
+    border: 3px solid white;
+  }
+  .slider-row input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--teal); cursor: pointer;
+    box-shadow: 0 2px 6px rgba(25,187,179,.4);
+    border: 3px solid white;
+  }
+  .slider-value {
+    min-width: 44px; text-align: center;
+    background: var(--teal); color: white;
+    padding: 4px 8px; border-radius: 8px;
+    font-weight: 700; font-size: 14px;
+  }
+  .slider-labels {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 11px; color: var(--gray-soft);
+  }
+
+  /* Mood pills */
+  .mood-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mood-pill {
+    cursor: pointer;
+    padding: 12px 8px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--beige-soft);
+    text-align: center;
+    font-size: 13px; font-weight: 600;
+    color: var(--gray);
+    transition: all .15s ease;
+    user-select: none;
+  }
+  .mood-pill .emoji { display: block; font-size: 22px; margin-bottom: 4px; }
+  .mood-pill:hover { border-color: var(--teal); }
+  .mood-pill.selected { border-color: var(--teal); background: var(--teal-soft); color: var(--teal-dark); }
+
+  /* Factor checkboxes */
+  .factors { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .factor {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--beige-soft);
+    cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    transition: all .15s ease;
+    user-select: none;
+  }
+  .factor:hover { border-color: var(--teal); }
+  .factor input { accent-color: var(--teal); width: 16px; height: 16px; cursor: pointer; }
+  .factor.checked { border-color: var(--teal); background: var(--teal-soft); color: var(--teal-dark); font-weight: 600; }
+
+  /* Buttons */
+  .btn {
+    cursor: pointer; font: inherit; font-weight: 600;
+    padding: 12px 18px; border-radius: 12px;
+    border: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all .15s ease;
+  }
+  .btn-primary { background: var(--teal); color: white; width: 100%; font-size: 15px; }
+  .btn-primary:hover { background: var(--teal-dark); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-secondary { background: var(--beige-soft); color: var(--gray); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--beige); }
+  .btn-orange { background: var(--orange); color: white; }
+  .btn-orange:hover { filter: brightness(.95); }
+  .btn-ghost { background: transparent; color: var(--gray-soft); padding: 6px 10px; }
+  .btn-ghost:hover { color: var(--orange); }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat-card {
+    background: white; padding: 14px 12px;
+    border-radius: 14px; text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-card .label { font-size: 11px; color: var(--gray-soft); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+  .stat-card .value { font-size: 22px; font-weight: 800; color: var(--teal); margin-top: 4px; }
+  .stat-card.orange .value { color: var(--orange); }
+  .stat-card.lime .value { color: #7fa01a; }
+
+  /* Streak */
+  .streak-banner {
+    background: linear-gradient(135deg, var(--orange), #ffa05c);
+    color: white; padding: 16px 18px;
+    border-radius: 16px; display: flex; align-items: center; gap: 14px;
+    margin-bottom: 16px; box-shadow: var(--shadow);
+  }
+  .streak-banner .flame { font-size: 32px; }
+  .streak-banner .num { font-size: 28px; font-weight: 800; line-height: 1; }
+  .streak-banner .lbl { font-size: 13px; opacity: .9; }
+
+  /* History entries */
+  .entry {
+    background: white;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--teal);
+  }
+  .entry-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .entry-date { font-weight: 700; font-size: 14px; }
+  .entry-actions { display: flex; gap: 4px; }
+  .entry-meta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-size: 13px; color: var(--gray-soft);
+    margin-bottom: 6px;
+  }
+  .entry-meta strong { color: var(--gray); font-weight: 600; }
+  .entry-quality {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 999px;
+    font-weight: 700; font-size: 12px;
+    background: var(--teal-soft); color: var(--teal-dark);
+  }
+  .entry-factors {
+    display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;
+  }
+  .factor-tag {
+    font-size: 11px; padding: 3px 8px;
+    background: var(--beige); color: var(--gray);
+    border-radius: 999px; font-weight: 500;
+  }
+  .entry-notes {
+    font-size: 13px; color: var(--gray); margin-top: 8px;
+    padding-top: 8px; border-top: 1px dashed var(--border);
+    font-style: italic;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .filter-chip {
+    cursor: pointer; padding: 6px 12px;
+    background: white; border: 1px solid var(--border);
+    border-radius: 999px; font-size: 12px; font-weight: 600;
+    color: var(--gray-soft);
+    transition: all .15s ease;
+  }
+  .filter-chip.active { background: var(--teal); color: white; border-color: var(--teal); }
+
+  /* Chart */
+  .chart-container { position: relative; }
+  .chart-wrap {
+    position: relative;
+    height: 180px;
+    background: var(--beige-soft);
+    border-radius: 12px;
+    padding: 12px 8px 28px 32px;
+  }
+  .chart-bars {
+    display: flex; align-items: flex-end; justify-content: space-around;
+    height: 100%; gap: 4px;
+  }
+  .chart-bar {
+    flex: 1; max-width: 28px; min-width: 6px;
+    background: var(--teal); border-radius: 6px 6px 0 0;
+    position: relative; cursor: pointer;
+    transition: opacity .15s ease;
+  }
+  .chart-bar:hover { opacity: .8; }
+  .chart-bar.below { background: var(--orange); }
+  .chart-bar .bar-label {
+    position: absolute; bottom: -22px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; color: var(--gray-soft); white-space: nowrap;
+  }
+  .chart-bar .bar-value {
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 700; color: var(--gray);
+  }
+  .chart-axis-y {
+    position: absolute; left: 4px; top: 12px; bottom: 28px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    font-size: 10px; color: var(--gray-soft);
+  }
+  .chart-target-line {
+    position: absolute; left: 32px; right: 8px;
+    border-top: 2px dashed var(--lime);
+    pointer-events: none;
+  }
+  .chart-legend {
+    display: flex; gap: 14px; margin-top: 12px;
+    font-size: 11px; color: var(--gray-soft); flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* Insights */
+  .insight {
+    background: var(--beige-soft);
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    border-left: 3px solid var(--lime);
+  }
+  .insight strong { color: var(--gray); font-weight: 700; }
+  .insight.best { border-left-color: var(--lime); }
+  .insight.worst { border-left-color: var(--orange); }
+  .insight.corr { border-left-color: var(--teal); }
+
+  /* Badges */
+  .badges-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px;
+  }
+  .badge {
+    text-align: center; padding: 14px 8px;
+    background: var(--beige-soft); border-radius: 12px;
+    opacity: .4; transition: all .2s ease;
+    border: 2px solid transparent;
+  }
+  .badge.unlocked {
+    opacity: 1;
+    background: linear-gradient(135deg, var(--teal-soft), white);
+    border-color: var(--teal);
+    box-shadow: 0 2px 8px rgba(25,187,179,.15);
+  }
+  .badge .icon { font-size: 28px; margin-bottom: 6px; }
+  .badge .name { font-size: 12px; font-weight: 700; color: var(--gray); }
+  .badge .desc { font-size: 10px; color: var(--gray-soft); margin-top: 2px; }
+
+  /* Empty */
+  .empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--gray-soft);
+  }
+  .empty .moon { font-size: 48px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; }
+
+  /* Learn */
+  .learn-section { margin-bottom: 20px; }
+  .learn-section h3 {
+    font-size: 16px; font-weight: 700; color: var(--teal-dark);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .learn-section h3 .num {
+    width: 26px; height: 26px; border-radius: 8px;
+    background: var(--teal); color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .learn-section p {
+    font-size: 14px; color: var(--gray);
+    margin-bottom: 10px;
+  }
+
+  /* Toast / celebration */
+  .celebration {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+    animation: fadeIn .3s ease;
+  }
+  .celebration-card {
+    background: white; padding: 30px 24px;
+    border-radius: 20px; text-align: center;
+    max-width: 320px; width: 100%;
+    box-shadow: var(--shadow-lg);
+    animation: pop .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .celebration-card .icon { font-size: 64px; margin-bottom: 12px; }
+  .celebration-card h3 { font-size: 22px; font-weight: 800; color: var(--orange); margin-bottom: 8px; }
+  .celebration-card p { font-size: 14px; color: var(--gray); margin-bottom: 18px; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--gray); color: white;
+    padding: 12px 18px; border-radius: 12px;
+    font-size: 14px; font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 999;
+    animation: slideUp .25s ease;
+  }
+
+  .export-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pop {
+    0% { transform: scale(.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { transform: translate(-50%, 20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+  }
+
+  @media (max-width: 480px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .stat-card .value { font-size: 17px; }
+    .factors { grid-template-columns: 1fr; }
+    .tab { font-size: 11px; }
+    .tab svg { width: 16px; height: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="brand">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>Sono em Dia</h1>
+      <p>Padrões, qualidade e consistência</p>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="register">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      Registrar
+    </button>
+    <button class="tab" data-tab="history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3h18M3 9h18M3 15h12M3 21h8"/>
+      </svg>
+      Histórico
+    </button>
+    <button class="tab" data-tab="progress">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5"/>
+      </svg>
+      Progresso
+    </button>
+    <button class="tab" data-tab="learn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      Saiba Mais
+    </button>
+  </nav>
+
+  <!-- REGISTER TAB -->
+  <section class="tab-panel" id="panel-register">
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        Registrar noite
+      </h2>
+
+      <div class="form-row">
+        <label for="entry-date">Data</label>
+        <input type="date" id="entry-date" />
+      </div>
+
+      <div class="grid-2">
+        <div class="form-row">
+          <label for="bed-time">Foi dormir <span style="color:var(--gray-soft);font-weight:400;">(24h)</span></label>
+          <input type="text" id="bed-time" inputmode="numeric" maxlength="5" placeholder="ex: 23:30" autocomplete="off" />
+        </div>
+        <div class="form-row">
+          <label for="wake-time">Acordou <span style="color:var(--gray-soft);font-weight:400;">(24h)</span></label>
+          <input type="text" id="wake-time" inputmode="numeric" maxlength="5" placeholder="ex: 07:00" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="duration-manual">Ou informar a duração (horas)</label>
+        <input type="number" id="duration-manual" min="0" max="14" step="0.25" placeholder="Ex: 7.5" />
+        <div id="calc-duration" class="duration-pill" style="display:none;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="calc-duration-text"></span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Qualidade do sono</label>
+        <div class="slider-wrap">
+          <div class="slider-row">
+            <input type="range" id="quality" min="1" max="10" step="1" value="7" />
+            <span class="slider-value" id="quality-value">7</span>
+          </div>
+          <div class="slider-labels"><span>Ruim</span><span>Excelente</span></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Como acordou</label>
+        <div class="mood-options">
+          <div class="mood-pill" data-mood="disposto"><span class="emoji">😊</span>Com energia</div>
+          <div class="mood-pill selected" data-mood="normal"><span class="emoji">😐</span>Normal</div>
+          <div class="mood-pill" data-mood="cansado"><span class="emoji">😴</span>Com cansaço</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Fatores que afetaram a noite</label>
+        <div class="factors" id="factors-list"></div>
+      </div>
+
+      <div class="form-row">
+        <label for="notes">Notas livres</label>
+        <textarea id="notes" placeholder="Como foi a noite? Sonhos, despertares, sensações..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" id="save-entry">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Salvar registro
+      </button>
+    </div>
+  </section>
+
+  <!-- HISTORY TAB -->
+  <section class="tab-panel" id="panel-history" style="display:none;">
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="8 5 4 12 8 19"/></svg>
+        Histórico
+      </h2>
+      <div class="filter-bar" id="period-filter">
+        <button class="filter-chip active" data-period="7">Últimos 7 dias</button>
+        <button class="filter-chip" data-period="30">30 dias</button>
+        <button class="filter-chip" data-period="90">90 dias</button>
+        <button class="filter-chip" data-period="all">Tudo</button>
+      </div>
+      <div class="export-buttons">
+        <button class="btn btn-secondary" id="copy-data">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar
+        </button>
+        <button class="btn btn-orange" id="download-csv">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Baixar CSV
+        </button>
+      </div>
+    </div>
+    <div id="history-list"></div>
+  </section>
+
+  <!-- PROGRESS TAB -->
+  <section class="tab-panel" id="panel-progress" style="display:none;">
+    <div id="streak-area"></div>
+    <div class="stats" id="stats-area"></div>
+
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Padrão dos últimos 14 dias
+      </h2>
+      <div class="chart-container" id="chart-container"></div>
+      <div class="chart-legend">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--teal);"></span>≥ 7h</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--orange);"></span>&lt; 7h</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--lime);border-radius:0;height:3px;"></span>Meta 7h</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Insights
+      </h2>
+      <div id="insights-area"></div>
+    </div>
+
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+        Conquistas
+      </h2>
+      <div class="badges-grid" id="badges-area"></div>
+    </div>
+  </section>
+
+  <!-- LEARN TAB -->
+  <section class="tab-panel" id="panel-learn" style="display:none;">
+    <div class="card">
+      <h2>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Saiba Mais sobre o sono
+      </h2>
+
+      <div class="learn-section">
+        <h3><span class="num">1</span> Por que sono é o pilar nº 1 da longevidade</h3>
+        <p>Entre nutrição, exercício e sono, o último é o que mais impacta a expectativa e qualidade de vida. Durante o sono, o cérebro ativa o sistema glinfático que limpa proteínas tóxicas associadas a doenças neurodegenerativas, o sistema imune se fortalece e hormônios essenciais como o GH são liberados.</p>
+        <p>Estudos populacionais mostram que dormir consistentemente menos de 6 horas por noite está associado a maior risco de doenças cardiovasculares, diabetes tipo 2, declínio cognitivo e mortalidade por todas as causas. Inversamente, quem dorme bem entre 7 e 9 horas vive mais e com mais vitalidade.</p>
+        <p>Sono não é tempo perdido. É o intervalo mais ativo de manutenção biológica do organismo, a base sobre a qual todos os outros hábitos saudáveis se sustentam.</p>
+      </div>
+
+      <div class="learn-section">
+        <h3><span class="num">2</span> Ciclos circadianos e por que o timing importa</h3>
+        <p>O corpo humano opera em um ciclo de aproximadamente 24 horas regido pelo núcleo supraquiasmático, no hipotálamo. Esse relógio biológico é sincronizado principalmente pela exposição à luz, especialmente a luz solar nas primeiras horas da manhã.</p>
+        <p>Quando você dorme e acorda em horários inconsistentes, o ritmo circadiano se desregula. Isso afeta a produção de melatonina, cortisol, leptina, grelina e outros hormônios essenciais. O resultado é fome desregulada, energia oscilante, humor instável e qualidade de sono pobre.</p>
+        <p>A consistência do horário de dormir importa tanto quanto a duração. Pessoas que dormem e acordam sempre nos mesmos horários, mesmo nos fins de semana, têm melhor saúde metabólica e cardiovascular.</p>
+      </div>
+
+      <div class="learn-section">
+        <h3><span class="num">3</span> As fases do sono e por que REM e deep sleep importam</h3>
+        <p>Cada noite de sono é composta por ciclos de cerca de 90 minutos, alternando entre sono leve, sono profundo (deep sleep) e sono REM (movimento rápido dos olhos). Uma noite saudável contém de 4 a 6 desses ciclos completos.</p>
+        <p>O deep sleep é quando o corpo se regenera fisicamente: tecidos são reparados, hormônios de crescimento são liberados e o sistema imune se fortalece. Já o sono REM é fundamental para a memória, o aprendizado, a regulação emocional e a criatividade.</p>
+        <p>Cortar o sono pela manhã prejudica especialmente o REM, que se concentra na segunda metade da noite. Por isso acordar mais cedo pode parecer pouco custoso em horas, mas é desproporcionalmente prejudicial à saúde mental e cognitiva.</p>
+      </div>
+
+      <div class="learn-section">
+        <h3><span class="num">4</span> Otimização prática</h3>
+        <p>Temperatura: o quarto deve estar entre 17 e 19 graus. O corpo precisa baixar a temperatura central para iniciar o sono, e ambientes quentes prejudicam esse processo.</p>
+        <p>Luz: bloqueie toda luz no quarto à noite. Pela manhã, exponha os olhos à luz natural por 10 a 15 minutos nas primeiras horas após acordar para ancorar seu ritmo circadiano.</p>
+        <p>Telas: evite luz azul de telas duas a três horas antes de dormir, ou use óculos com filtro. A luz azul suprime a produção de melatonina e atrasa o início do sono.</p>
+        <p>Melatonina: doses pequenas de 0,3 a 0,5 mg, tomadas 30 minutos antes de dormir, podem ajudar a regular o ritmo. Doses altas são contraproducentes.</p>
+        <p>Timing: evite cafeína após o meio-dia (meia vida de 6 horas), álcool nas 4 horas antes de dormir (fragmenta o sono REM) e refeições pesadas perto da hora de dormir. Exercício pela manhã ou tarde melhora o sono profundo daquela noite.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- State ----------
+  const STORAGE_KEY = 'sono-em-dia-v1';
+  const FACTORS = [
+    { id: 'exercicio', label: 'Exercício' },
+    { id: 'cafeina', label: 'Cafeína' },
+    { id: 'tela', label: 'Tela antes de dormir' },
+    { id: 'meditacao', label: 'Meditação' },
+    { id: 'suplementos', label: 'Suplementos' },
+    { id: 'alcool', label: 'Álcool' },
+    { id: 'refeicao', label: 'Refeição pesada' },
+    { id: 'estresse', label: 'Estresse' },
+  ];
+  const BADGES = [
+    { id: 'first', icon: '🌙', name: 'Primeira noite', desc: 'Registre sua primeira noite', check: e => e.length >= 1 },
+    { id: 'seven', icon: '⭐', name: '7 noites', desc: 'Registre 7 noites', check: e => e.length >= 7 },
+    { id: 'thirty', icon: '🏆', name: '30 noites', desc: 'Registre 30 noites', check: e => e.length >= 30 },
+    { id: 'quality8', icon: '✨', name: 'Qualidade 8+', desc: 'Tenha uma noite com qualidade 8 ou maior', check: e => e.some(x => x.quality >= 8) },
+    { id: 'eight-hours', icon: '🛌', name: 'Dormir 8h seguidas', desc: 'Registre uma noite com 8h ou mais', check: e => e.some(x => x.duration >= 8) },
+    { id: 'streak7', icon: '🔥', name: 'Streak de 7', desc: '7 dias seguidos com registro', check: () => computeStreak() >= 7 },
+    { id: 'consistent', icon: '🎯', name: 'Consistente', desc: '5 noites com qualidade 7+', check: e => e.filter(x => x.quality >= 7).length >= 5 },
+  ];
+
+  let state = {
+    entries: [],
+    unlockedBadges: [],
+    celebratedStreak7: false,
+  };
+
+  // ---------- Storage ----------
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        state.entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+        state.unlockedBadges = Array.isArray(parsed.unlockedBadges) ? parsed.unlockedBadges : [];
+        state.celebratedStreak7 = !!parsed.celebratedStreak7;
+      }
+    } catch (e) { console.error('load error', e); }
+  }
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // ---------- Helpers ----------
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function todayISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+  function formatDateBR(iso) {
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  function dayOfWeekBR(iso) {
+    const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const [y, m, d] = iso.split('-').map(Number);
+    return days[new Date(y, m-1, d).getDay()];
+  }
+  function isValidTime(t) {
+    if (!t) return false;
+    const m = /^(\d{1,2}):(\d{2})$/.exec(t);
+    if (!m) return false;
+    const h = +m[1], mm = +m[2];
+    return h >= 0 && h <= 23 && mm >= 0 && mm <= 59;
+  }
+  function normalizeTime(t) {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(t);
+    if (!m) return t;
+    return pad(+m[1]) + ':' + m[2];
+  }
+  function calcDuration(bed, wake) {
+    if (!isValidTime(bed) || !isValidTime(wake)) return null;
+    const [bh, bm] = bed.split(':').map(Number);
+    const [wh, wm] = wake.split(':').map(Number);
+    let mins = (wh * 60 + wm) - (bh * 60 + bm);
+    if (mins <= 0) mins += 24 * 60;
+    return Math.round((mins / 60) * 100) / 100;
+  }
+  function formatHours(h) {
+    if (h == null) return '—';
+    const hh = Math.floor(h);
+    const mm = Math.round((h - hh) * 60);
+    return mm > 0 ? `${hh}h${pad(mm)}` : `${hh}h`;
+  }
+  function moodLabel(m) {
+    return ({ disposto: 'Com energia', normal: 'Normal', cansado: 'Com cansaço' })[m] || m;
+  }
+  function moodEmoji(m) {
+    return ({ disposto: '😊', normal: '😐', cansado: '😴' })[m] || '😐';
+  }
+
+  // ---------- Computations ----------
+  function computeStreak() {
+    if (state.entries.length === 0) return 0;
+    const dates = new Set(state.entries.map(e => e.date));
+    let streak = 0;
+    let cur = new Date();
+    cur.setHours(0,0,0,0);
+    // allow today or yesterday as starting point
+    const todayKey = cur.getFullYear() + '-' + pad(cur.getMonth()+1) + '-' + pad(cur.getDate());
+    if (!dates.has(todayKey)) {
+      cur.setDate(cur.getDate() - 1);
+    }
+    while (true) {
+      const key = cur.getFullYear() + '-' + pad(cur.getMonth()+1) + '-' + pad(cur.getDate());
+      if (dates.has(key)) {
+        streak++;
+        cur.setDate(cur.getDate() - 1);
+      } else break;
+    }
+    return streak;
+  }
+
+  function getFiltered(period) {
+    const sorted = [...state.entries].sort((a,b) => b.date.localeCompare(a.date));
+    if (period === 'all') return sorted;
+    const days = parseInt(period, 10);
+    const cutoff = new Date();
+    cutoff.setHours(0,0,0,0);
+    cutoff.setDate(cutoff.getDate() - days + 1);
+    return sorted.filter(e => {
+      const [y, m, d] = e.date.split('-').map(Number);
+      return new Date(y, m-1, d) >= cutoff;
+    });
+  }
+
+  // ---------- Render ----------
+  function renderFactorsForm() {
+    const container = document.getElementById('factors-list');
+    container.innerHTML = FACTORS.map(f => `
+      <label class="factor" data-id="${f.id}">
+        <input type="checkbox" value="${f.id}" />
+        <span>${f.label}</span>
+      </label>
+    `).join('');
+    container.querySelectorAll('.factor').forEach(el => {
+      const cb = el.querySelector('input');
+      cb.addEventListener('change', () => el.classList.toggle('checked', cb.checked));
+    });
+  }
+
+  let selectedMood = 'normal';
+  function bindMood() {
+    document.querySelectorAll('.mood-pill').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedMood = el.dataset.mood;
+      });
+    });
+  }
+
+  function bindForm() {
+    document.getElementById('entry-date').value = todayISO();
+    document.getElementById('quality').addEventListener('input', e => {
+      document.getElementById('quality-value').textContent = e.target.value;
+    });
+    function updateCalc() {
+      const bed = document.getElementById('bed-time').value;
+      const wake = document.getElementById('wake-time').value;
+      const manual = document.getElementById('duration-manual').value;
+      const pill = document.getElementById('calc-duration');
+      const text = document.getElementById('calc-duration-text');
+      if (manual) {
+        pill.style.display = 'inline-flex';
+        text.textContent = `Duração: ${formatHours(parseFloat(manual))}`;
+      } else if (bed && wake) {
+        const d = calcDuration(bed, wake);
+        pill.style.display = 'inline-flex';
+        text.textContent = `Duração: ${formatHours(d)}`;
+      } else {
+        pill.style.display = 'none';
+      }
+    }
+    function maskTime(e) {
+      let v = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
+      if (v.length >= 3) v = v.slice(0, 2) + ':' + v.slice(2);
+      e.target.value = v;
+      updateCalc();
+    }
+    ['bed-time','wake-time'].forEach(id => {
+      document.getElementById(id).addEventListener('input', maskTime);
+    });
+    document.getElementById('duration-manual').addEventListener('input', updateCalc);
+
+    document.getElementById('save-entry').addEventListener('click', saveEntry);
+  }
+
+  function saveEntry() {
+    const date = document.getElementById('entry-date').value;
+    const bed = document.getElementById('bed-time').value;
+    const wake = document.getElementById('wake-time').value;
+    const manual = document.getElementById('duration-manual').value;
+    const quality = parseInt(document.getElementById('quality').value, 10);
+    const notes = document.getElementById('notes').value.trim();
+    const factors = Array.from(document.querySelectorAll('#factors-list input:checked')).map(c => c.value);
+
+    if (!date) { toast('Informe a data'); return; }
+
+    let duration = null;
+    let bedNorm = null, wakeNorm = null;
+    if (manual) {
+      duration = parseFloat(manual);
+    } else if (bed || wake) {
+      if (!isValidTime(bed) || !isValidTime(wake)) {
+        toast('Use o formato HH:MM (24h)'); return;
+      }
+      bedNorm = normalizeTime(bed);
+      wakeNorm = normalizeTime(wake);
+      duration = calcDuration(bedNorm, wakeNorm);
+    }
+
+    if (duration == null || isNaN(duration)) { toast('Informe horários ou duração'); return; }
+
+    // Replace if same date exists
+    const existingIndex = state.entries.findIndex(e => e.date === date);
+    const entry = {
+      id: Date.now().toString(36),
+      date, bedTime: bedNorm, wakeTime: wakeNorm,
+      duration, quality, mood: selectedMood, factors, notes,
+      createdAt: new Date().toISOString(),
+    };
+    if (existingIndex >= 0) {
+      entry.id = state.entries[existingIndex].id;
+      state.entries[existingIndex] = entry;
+      toast('Registro atualizado');
+    } else {
+      state.entries.push(entry);
+      toast('Registro salvo');
+    }
+
+    checkBadges();
+    save();
+    resetForm();
+    checkStreakCelebration();
+    renderAll();
+  }
+
+  function resetForm() {
+    document.getElementById('entry-date').value = todayISO();
+    document.getElementById('bed-time').value = '';
+    document.getElementById('wake-time').value = '';
+    document.getElementById('duration-manual').value = '';
+    document.getElementById('quality').value = '7';
+    document.getElementById('quality-value').textContent = '7';
+    document.getElementById('notes').value = '';
+    document.querySelectorAll('#factors-list input').forEach(c => { c.checked = false; c.parentElement.classList.remove('checked'); });
+    document.querySelectorAll('.mood-pill').forEach(p => p.classList.toggle('selected', p.dataset.mood === 'normal'));
+    selectedMood = 'normal';
+    document.getElementById('calc-duration').style.display = 'none';
+  }
+
+  // ---------- History ----------
+  let currentPeriod = '7';
+  function bindHistory() {
+    document.querySelectorAll('#period-filter .filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#period-filter .filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentPeriod = chip.dataset.period;
+        renderHistory();
+      });
+    });
+    document.getElementById('copy-data').addEventListener('click', copyData);
+    document.getElementById('download-csv').addEventListener('click', downloadCSV);
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    const entries = getFiltered(currentPeriod);
+    if (entries.length === 0) {
+      list.innerHTML = `<div class="card empty"><div class="moon">🌙</div><p>Nenhum registro neste período.<br>Comece registrando sua noite na aba Registrar.</p></div>`;
+      return;
+    }
+    list.innerHTML = entries.map(e => {
+      const factorTags = e.factors.length
+        ? `<div class="entry-factors">${e.factors.map(f => `<span class="factor-tag">${(FACTORS.find(x=>x.id===f)||{}).label || f}</span>`).join('')}</div>`
+        : '';
+      const notes = e.notes ? `<div class="entry-notes">"${escapeHtml(e.notes)}"</div>` : '';
+      const times = (e.bedTime && e.wakeTime) ? `${e.bedTime} → ${e.wakeTime}` : 'Duração informada';
+      return `
+        <div class="entry">
+          <div class="entry-head">
+            <div class="entry-date">${dayOfWeekBR(e.date)}, ${formatDateBR(e.date)}</div>
+            <div class="entry-actions">
+              <button class="btn btn-ghost" data-del="${e.id}" title="Excluir">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="entry-meta">
+            <span><strong>${formatHours(e.duration)}</strong> de sono</span>
+            <span class="entry-quality">★ ${e.quality}/10</span>
+            <span>${moodEmoji(e.mood)} ${moodLabel(e.mood)}</span>
+          </div>
+          <div class="entry-meta" style="font-size:12px;">${times}</div>
+          ${factorTags}
+          ${notes}
+        </div>`;
+    }).join('');
+    list.querySelectorAll('[data-del]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (confirm('Excluir este registro?')) {
+          state.entries = state.entries.filter(x => x.id !== btn.dataset.del);
+          save();
+          renderAll();
+          toast('Registro excluído');
+        }
+      });
+    });
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ---------- Export ----------
+  function buildCSV() {
+    const header = ['data','foi_dormir','acordou','duracao_horas','qualidade','como_acordou','fatores','notas'];
+    const rows = [...state.entries].sort((a,b) => a.date.localeCompare(b.date)).map(e => [
+      e.date, e.bedTime || '', e.wakeTime || '',
+      e.duration, e.quality, moodLabel(e.mood),
+      e.factors.map(f => (FACTORS.find(x=>x.id===f)||{}).label || f).join('; '),
+      (e.notes || '').replace(/"/g, '""').replace(/\n/g, ' '),
+    ]);
+    return [header, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  }
+  function downloadCSV() {
+    if (state.entries.length === 0) { toast('Sem dados para exportar'); return; }
+    const csv = buildCSV();
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `sono-em-dia-${todayISO()}.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('CSV baixado');
+  }
+  function copyData() {
+    if (state.entries.length === 0) { toast('Sem dados para copiar'); return; }
+    const csv = buildCSV();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(csv).then(() => toast('Copiado para a área de transferência')).catch(() => fallbackCopy(csv));
+    } else fallbackCopy(csv);
+  }
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('Copiado'); } catch (e) { toast('Não foi possível copiar'); }
+    document.body.removeChild(ta);
+  }
+
+  // ---------- Progress: stats, chart, insights, badges ----------
+  function renderProgress() {
+    renderStreak();
+    renderStats();
+    renderChart();
+    renderInsights();
+    renderBadges();
+  }
+
+  function renderStreak() {
+    const s = computeStreak();
+    if (s === 0) {
+      document.getElementById('streak-area').innerHTML = `
+        <div class="streak-banner" style="background:linear-gradient(135deg,var(--gray),#6a6f74);">
+          <span class="flame">🌙</span>
+          <div>
+            <div class="num">0</div>
+            <div class="lbl">Registre hoje para começar seu streak</div>
+          </div>
+        </div>`;
+    } else {
+      document.getElementById('streak-area').innerHTML = `
+        <div class="streak-banner">
+          <span class="flame">🔥</span>
+          <div>
+            <div class="num">${s}</div>
+            <div class="lbl">${s === 1 ? 'dia seguido com registro' : 'dias seguidos com registro'}</div>
+          </div>
+        </div>`;
+    }
+  }
+
+  function renderStats() {
+    const entries = state.entries;
+    if (entries.length === 0) {
+      document.getElementById('stats-area').innerHTML = '';
+      return;
+    }
+    const avgDur = entries.reduce((s,e) => s + e.duration, 0) / entries.length;
+    const avgQ = entries.reduce((s,e) => s + e.quality, 0) / entries.length;
+    const above7 = entries.filter(e => e.duration >= 7).length;
+    document.getElementById('stats-area').innerHTML = `
+      <div class="stat-card"><div class="label">Média</div><div class="value">${formatHours(Math.round(avgDur*100)/100)}</div></div>
+      <div class="stat-card lime"><div class="label">≥ 7h</div><div class="value">${above7}/${entries.length}</div></div>
+      <div class="stat-card orange"><div class="label">Qualidade</div><div class="value">${avgQ.toFixed(1)}</div></div>`;
+  }
+
+  function renderChart() {
+    const container = document.getElementById('chart-container');
+    const recent = [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      const key = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+      const entry = state.entries.find(e => e.date === key);
+      recent.push({ date: key, day: d.getDate(), duration: entry ? entry.duration : 0 });
+    }
+    const max = Math.max(10, ...recent.map(r => r.duration));
+    // chart-wrap height=180px, padding-top=12px, padding-bottom=28px → drawable area = 140px
+    const drawableH = 140;
+    const targetTopPx = Math.round(12 + (1 - 7 / max) * drawableH);
+    container.innerHTML = `
+      <div class="chart-wrap">
+        <div class="chart-axis-y">
+          <span>${max.toFixed(0)}h</span>
+          <span>${(max/2).toFixed(0)}h</span>
+          <span>0h</span>
+        </div>
+        <div class="chart-target-line" style="top: ${targetTopPx}px;"></div>
+        <div class="chart-bars">
+          ${recent.map(r => {
+            if (!r.duration) return `<div class="chart-bar" style="height:2px;background:var(--border);" title="Sem registro"><span class="bar-label">${r.day}</span></div>`;
+            const h = Math.max(4, (r.duration / max) * 100);
+            const cls = r.duration >= 7 ? '' : 'below';
+            return `<div class="chart-bar ${cls}" style="height:${h}%;" title="${formatHours(r.duration)}"><span class="bar-value">${r.duration.toFixed(1)}</span><span class="bar-label">${r.day}</span></div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  function renderInsights() {
+    const area = document.getElementById('insights-area');
+    const entries = state.entries;
+    if (entries.length === 0) {
+      area.innerHTML = '<div class="empty" style="padding:20px;">Registre algumas noites para ver seus padrões.</div>';
+      return;
+    }
+    const sorted = [...entries].sort((a,b) => b.quality - a.quality || b.duration - a.duration);
+    const best = sorted[0];
+    const worst = sorted[sorted.length - 1];
+
+    let html = '';
+    html += `<div class="insight best"><strong>🌟 Melhor noite:</strong> ${formatDateBR(best.date)} — ${formatHours(best.duration)}, qualidade ${best.quality}/10</div>`;
+    if (entries.length > 1) {
+      html += `<div class="insight worst"><strong>⚠️ Pior noite:</strong> ${formatDateBR(worst.date)} — ${formatHours(worst.duration)}, qualidade ${worst.quality}/10</div>`;
+    }
+
+    // Correlations per factor
+    const correlations = [];
+    FACTORS.forEach(f => {
+      const withF = entries.filter(e => e.factors.includes(f.id));
+      const withoutF = entries.filter(e => !e.factors.includes(f.id));
+      if (withF.length >= 2 && withoutF.length >= 1) {
+        const avgWith = withF.reduce((s,e) => s + e.quality, 0) / withF.length;
+        const avgWithout = withoutF.reduce((s,e) => s + e.quality, 0) / withoutF.length;
+        const diff = avgWith - avgWithout;
+        correlations.push({ factor: f, avgWith, avgWithout, diff, count: withF.length });
+      }
+    });
+    correlations.sort((a,b) => Math.abs(b.diff) - Math.abs(a.diff));
+    correlations.slice(0, 3).forEach(c => {
+      const arrow = c.diff > 0 ? 'maior' : 'menor';
+      html += `<div class="insight corr"><strong>📊 ${c.factor.label}:</strong> ${c.count} ${c.count === 1 ? 'noite teve' : 'noites tiveram'} qualidade ${c.avgWith.toFixed(1)} em média (${Math.abs(c.diff).toFixed(1)} pontos ${arrow} que sem este fator)</div>`;
+    });
+
+    area.innerHTML = html;
+  }
+
+  function renderBadges() {
+    const area = document.getElementById('badges-area');
+    area.innerHTML = BADGES.map(b => {
+      const unlocked = b.check(state.entries);
+      return `<div class="badge ${unlocked ? 'unlocked' : ''}">
+        <div class="icon">${b.icon}</div>
+        <div class="name">${b.name}</div>
+        <div class="desc">${b.desc}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function checkBadges() {
+    const newly = [];
+    BADGES.forEach(b => {
+      if (b.check(state.entries) && !state.unlockedBadges.includes(b.id)) {
+        state.unlockedBadges.push(b.id);
+        newly.push(b);
+      }
+    });
+    if (newly.length > 0) {
+      setTimeout(() => {
+        newly.forEach((b, i) => setTimeout(() => toast(`${b.icon} Conquista desbloqueada: ${b.name}`), i * 1500));
+      }, 600);
+    }
+  }
+
+  function checkStreakCelebration() {
+    if (computeStreak() >= 7 && !state.celebratedStreak7) {
+      state.celebratedStreak7 = true;
+      save();
+      celebrate();
+    }
+  }
+
+  function celebrate() {
+    const overlay = document.createElement('div');
+    overlay.className = 'celebration';
+    overlay.innerHTML = `
+      <div class="celebration-card">
+        <div class="icon">🎉</div>
+        <h3>7 dias seguidos!</h3>
+        <p>Você está construindo um hábito poderoso. Consistência é o segredo do sono que regenera. Continue assim.</p>
+        <button class="btn btn-primary" id="celeb-close">Continuar</button>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('#celeb-close').addEventListener('click', () => overlay.remove());
+  }
+
+  // ---------- Toast ----------
+  let toastTimer = null;
+  function toast(msg) {
+    const old = document.querySelector('.toast');
+    if (old) old.remove();
+    if (toastTimer) clearTimeout(toastTimer);
+    const t = document.createElement('div');
+    t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t);
+    toastTimer = setTimeout(() => t.remove(), 2400);
+  }
+
+  // ---------- Tabs ----------
+  function bindTabs() {
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+        document.getElementById('panel-' + tab.dataset.tab).style.display = 'block';
+        if (tab.dataset.tab === 'history') renderHistory();
+        if (tab.dataset.tab === 'progress') renderProgress();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  }
+
+  function renderAll() {
+    const active = document.querySelector('.tab.active').dataset.tab;
+    if (active === 'history') renderHistory();
+    if (active === 'progress') renderProgress();
+  }
+
+  // ---------- Init ----------
+  load();
+  renderFactorsForm();
+  bindMood();
+  bindForm();
+  bindTabs();
+  bindHistory();
+})();
+</script>
+</body>
+</html>
