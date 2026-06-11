@@ -689,20 +689,20 @@
     const [y, m, d] = iso.split('-').map(Number);
     return days[new Date(y, m-1, d).getDay()];
   }
-  // TIME-1: aceita formato internacional (23:30) e brasileiro (23h30)
-  const TIME_RE = /^(\d{1,2})[h:](\d{2})$/i;
+  // TIME-1: aceita 23:30, 23h30, 6h30 e hora cheia ("22h" ou "22" = 22h00)
+  const TIME_RE = /^(\d{1,2})(?:[h:](\d{2})?)?$/i;
   function isValidTime(t) {
     if (!t) return false;
     const m = TIME_RE.exec(t);
     if (!m) return false;
-    const h = +m[1], mm = +m[2];
+    const h = +m[1], mm = m[2] === undefined ? 0 : +m[2];
     return h >= 0 && h <= 23 && mm >= 0 && mm <= 59;
   }
   // TIME-2: normaliza qualquer formato aceito para o padrão interno "HH:MM"
   function normalizeTime(t) {
     const m = TIME_RE.exec(t);
     if (!m) return t;
-    return pad(+m[1]) + ':' + m[2];
+    return pad(+m[1]) + ':' + (m[2] || '00');
   }
   // TIME-3: exibe o padrão interno "HH:MM" como "23h30" (formato BR)
   function formatTimeBR(t) {
@@ -903,10 +903,26 @@
       }
     }
     function maskTime(e) {
-      // TIME-2: máscara converte digitação (e colagem de "23:30") para "23h30"
-      let v = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
-      if (v.length >= 3) v = v.slice(0, 2) + 'h' + v.slice(2);
-      e.target.value = v;
+      // LOG-4: máscara reescrita — a anterior engolia o "h" digitado e assumia
+      // hora sempre com 2 dígitos ("6h30" virava "63h0", "22h" ficava "22")
+      const raw = e.target.value.toLowerCase().replace(/:/g, 'h').replace(/[^0-9h]/g, '');
+      const sepIdx = raw.indexOf('h');
+      const sepTyped = sepIdx > 0;
+      let h, m;
+      if (sepTyped) {
+        // usuário marcou onde a hora termina — respeita
+        h = raw.slice(0, sepIdx).slice(0, 2);
+        m = raw.slice(sepIdx + 1).replace(/h/g, '').slice(0, 2);
+      } else {
+        const digits = raw.replace(/h/g, '').slice(0, 4);
+        if (digits.length <= 2) { h = digits; m = ''; }
+        else {
+          h = digits.slice(0, 2); m = digits.slice(2);
+          // 3-4 dígitos sem separador: hora "63" não existe, então "630" = 6h30
+          if (+h > 23) { h = digits.slice(0, 1); m = digits.slice(1, 3); }
+        }
+      }
+      e.target.value = h + (sepTyped || m ? 'h' + m : '');
       updateCalc();
     }
     ['bed-time','wake-time'].forEach(id => {
