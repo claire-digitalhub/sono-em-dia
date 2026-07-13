@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<!-- tracker-kit:start -->
+<script>/* tracker-kit — gerado por @tracker-core/kit; não editar à mão */
+"use strict";var TrackerKit=(()=>{var x=Object.defineProperty;var N=Object.getOwnPropertyDescriptor;var O=Object.getOwnPropertyNames;var I=Object.prototype.hasOwnProperty;var A=(t,e)=>{for(var n in e)x(t,n,{get:e[n],enumerable:!0})},F=(t,e,n,r)=>{if(e&&typeof e=="object"||typeof e=="function")for(let o of O(e))!I.call(t,o)&&o!==n&&x(t,o,{get:()=>e[o],enumerable:!(r=N(e,o))||r.enumerable});return t};var L=t=>F(x({},"__esModule",{value:!0}),t);var J={};A(J,{DATE_KEY_RE:()=>v,addDays:()=>d,average:()=>D,buildCSV:()=>V,computeStreak:()=>$,createStore:()=>B,csvField:()=>T,dateKey:()=>g,daysInMonth:()=>E,downloadCSV:()=>w,escapeHtml:()=>U,fillLastNDays:()=>q,formatDateBR:()=>C,groupBy:()=>M,groupByWeek:()=>_,isValidDateKey:()=>p,lastNDays:()=>j,makeDateStr:()=>h,mondayOf:()=>R,pad2:()=>k,parseDateKey:()=>m,pearson:()=>z,sanitize:()=>y,todayStr:()=>f,weekKey:()=>S});var v=/^\d{4}-\d{2}-\d{2}$/,k=t=>String(t).padStart(2,"0"),h=(t,e,n)=>`${t}-${k(e+1)}-${k(n)}`,g=t=>h(t.getFullYear(),t.getMonth(),t.getDate()),f=()=>g(new Date),m=t=>{let[e,n,r]=t.split("-").map(Number);return new Date(e,n-1,r)},p=t=>{if(typeof t!="string"||!v.test(t))return!1;let e=m(t);return!Number.isNaN(e.getTime())&&g(e)===t},d=(t,e)=>{let n=m(t);return n.setDate(n.getDate()+e),g(n)},E=(t,e)=>new Date(t,e+1,0).getDate(),R=t=>{let e=m(t),n=e.getDay(),r=n===0?-6:1-n;return e.setDate(e.getDate()+r),g(e)},S=R,C=(t,e)=>m(t).toLocaleDateString("pt-BR",e);function $(t,e={}){let{today:n=f(),graceToday:r=!0,maxLookback:o=3660}=e,s=new Set;for(let a of t)p(a)&&s.add(a);if(s.size===0)return 0;let u=n;if(!s.has(u)&&(!r||(u=d(u,-1),!s.has(u))))return 0;let l=0;for(;s.has(u)&&l<o;)l++,u=d(u,-1);return l}function y(t,e){var n,r,o,s,u,l;switch(t.type){case"string":{let a=(n=t.default)!=null?n:"";return typeof e!="string"?a:t.max!=null?e.slice(0,t.max):e}case"number":{let a=(o=(r=t.default)!=null?r:t.min)!=null?o:0,c=typeof e=="boolean"?NaN:Number(e);if(!Number.isFinite(c))return a;let i=c;return t.round&&(i=Math.round(i)),t.min!=null&&(i=Math.max(t.min,i)),t.max!=null&&(i=Math.min(t.max,i)),i}case"boolean":return typeof e=="boolean"?e:(s=t.default)!=null?s:!1;case"enum":{let a=(u=t.default)!=null?u:t.values[0];return typeof e=="string"&&t.values.includes(e)?e:a}case"dateKey":return p(e)?e:(l=t.default)!=null?l:"";case"array":return Array.isArray(e)?(t.max!=null?e.slice(0,t.max):e).map(c=>y(t.of,c)):[];case"object":{let a=e&&typeof e=="object"&&!Array.isArray(e)?e:{},c={};for(let[i,b]of Object.entries(t.fields))c[i]=y(b,a[i]);return c}case"record":{let a=e&&typeof e=="object"&&!Array.isArray(e)?e:{},c={},i=0;for(let[b,K]of Object.entries(a))if(!(t.keys==="dateKey"&&!p(b))){if(t.max!=null&&i>=t.max)break;c[b]=y(t.of,K),i++}return c}}}function B(t){var n;let e=(n=t.storage)!=null?n:globalThis.localStorage;return{load(){let r;try{let o=e.getItem(t.key);o!=null&&(r=JSON.parse(o))}catch(o){}return y(t.schema,r)},save(r){try{return e.setItem(t.key,JSON.stringify(r)),!0}catch(o){return!1}},clear(){try{e.removeItem(t.key)}catch(r){}}}}function T(t){let e=t==null?"":String(t);return/^[=+\-@\t\r]/.test(e)&&(e=`'${e}`),/[",\n\r]/.test(e)?`"${e.replace(/"/g,'""')}"`:e}function V(t,e){let n=[t.map(T).join(",")];for(let r of e)n.push(r.map(T).join(","));return n.join(`\r
+`)}function w(t,e){let n=new Blob(["\uFEFF"+e],{type:"text/csv;charset=utf-8"}),r=URL.createObjectURL(n),o=document.createElement("a");o.href=r,o.download=t,document.body.appendChild(o),o.click(),o.remove(),URL.revokeObjectURL(r)}var P={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"};function U(t){return String(t!=null?t:"").replace(/[&<>"']/g,e=>P[e])}function M(t,e){let n=new Map;for(let r of t){let o=e(r),s=n.get(o);s?s.push(r):n.set(o,[r])}return n}function _(t,e){return M(t,n=>S(e(n)))}function j(t,e=f()){let n=[];for(let r=t-1;r>=0;r--)n.push(d(e,-r));return n}function q(t,e,n,r=f()){let o=e instanceof Map?s=>e.has(s)?e.get(s):n:s=>Object.prototype.hasOwnProperty.call(e,s)?e[s]:n;return j(t,r).map(s=>({date:s,value:o(s)}))}function D(t){return t.length===0?0:t.reduce((e,n)=>e+n,0)/t.length}function z(t,e){let n=Math.min(t.length,e.length);if(n<2)return 0;let r=D(t.slice(0,n)),o=D(e.slice(0,n)),s=0,u=0,l=0;for(let a=0;a<n;a++){let c=t[a]-r,i=e[a]-o;s+=c*i,u+=c*c,l+=i*i}return u===0||l===0?0:s/Math.sqrt(u*l)}return L(J);})();</script>
+<!-- tracker-kit:end -->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 <title>Sono em Dia</title>
@@ -670,15 +675,15 @@
     }
   }
   // ---------- Helpers ----------
-  function pad(n) { return String(n).padStart(2, '0'); }
+  // migrado p/ @tracker-core/kit (mesma lógica, fonte única)
+  function pad(n) { return TrackerKit.pad2(n); }
 
-  // DRY-1: extracted helper — was duplicated in todayISO, computeStreak, renderChart
   function dateToISO(d) {
-    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+    return TrackerKit.dateKey(d);
   }
 
   function todayISO() {
-    return dateToISO(new Date()); // DRY-1: was inline expression
+    return TrackerKit.todayStr();
   }
   function formatDateBR(iso) {
     const [y, m, d] = iso.split('-');
@@ -733,29 +738,15 @@
   function moodEmoji(m) {
     return ({ disposto: '😊', normal: '😐', cansado: '😴' })[m] || '😐';
   }
+  // migrado p/ @tracker-core/kit (mesmo mapa de escape)
   function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    return TrackerKit.escapeHtml(s);
   }
   // ---------- Computations ----------
   function computeStreak() {
-    if (state.entries.length === 0) return 0;
-    const dates = new Set(state.entries.map(e => e.date));
-    let streak = 0;
-    let cur = new Date();
-    cur.setHours(0,0,0,0);
-    // allow today or yesterday as starting point
-    const todayKey = dateToISO(cur); // DRY-1: was inline expression
-    if (!dates.has(todayKey)) {
-      cur.setDate(cur.getDate() - 1);
-    }
-    while (true) {
-      const key = dateToISO(cur); // DRY-1: was inline expression
-      if (dates.has(key)) {
-        streak++;
-        cur.setDate(cur.getDate() - 1);
-      } else break;
-    }
-    return streak;
+    // migrado p/ @tracker-core/kit — mesma semântica (hoje sem registro
+    // não quebra: começa por hoje ou ontem)
+    return TrackerKit.computeStreak(state.entries.map(e => e.date));
   }
   function getFiltered(period) {
     const sorted = [...state.entries].sort((a,b) => b.date.localeCompare(a.date));
